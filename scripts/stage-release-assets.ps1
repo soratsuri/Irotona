@@ -60,7 +60,14 @@ try {
     throw "git status failed with exit code $statusExitCode. $statusDetails"
   }
   if ($statusOutput.Count -gt 0) {
-    throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)"
+    $diffOutput = @(git diff --no-ext-diff -- src-tauri/Cargo.toml 2>&1)
+    $diffExitCode = $LASTEXITCODE
+    $diffDetails = if ($diffExitCode -eq 0) {
+      $diffOutput -join [Environment]::NewLine
+    } else {
+      "Could not read Cargo.toml diff (git diff exit code $diffExitCode): $($diffOutput -join [Environment]::NewLine)"
+    }
+    throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)`n$diffDetails"
   }
 
   $metadataJson = cargo metadata --manifest-path src-tauri/Cargo.toml --locked --offline --format-version 1 --filter-platform x86_64-pc-windows-msvc
