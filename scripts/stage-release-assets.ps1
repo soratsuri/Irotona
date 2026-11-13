@@ -63,15 +63,19 @@ try {
     $previousNativeCommandPreference = $PSNativeCommandUseErrorActionPreference
     $PSNativeCommandUseErrorActionPreference = $false
     try {
-      $diffOutput = @(git diff --no-ext-diff --text -- src-tauri/Cargo.toml 2>&1)
+      $diffOutput = @(git diff --quiet HEAD -- 2>&1)
       $diffExitCode = $LASTEXITCODE
-      $eolOutput = @(git ls-files --eol -- src-tauri/Cargo.toml 2>&1)
-      $eolExitCode = $LASTEXITCODE
+      $untrackedOutput = @(git ls-files --others --exclude-standard 2>&1)
+      $untrackedExitCode = $LASTEXITCODE
     } finally {
       $PSNativeCommandUseErrorActionPreference = $previousNativeCommandPreference
     }
-    $diffDetails = "git diff exit code: $diffExitCode`n$($diffOutput -join [Environment]::NewLine)`ngit ls-files --eol exit code: $eolExitCode`n$($eolOutput -join [Environment]::NewLine)"
-    throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)`n$diffDetails"
+    if ($diffExitCode -eq 0 -and $untrackedExitCode -eq 0 -and $untrackedOutput.Count -eq 0) {
+      Write-Host 'Git status reported changes, but the worktree matches HEAD and has no untracked files.'
+    } else {
+      $diffDetails = "git diff exit code: $diffExitCode`n$($diffOutput -join [Environment]::NewLine)`ngit ls-files exit code: $untrackedExitCode`n$($untrackedOutput -join [Environment]::NewLine)"
+      throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)`n$diffDetails"
+    }
   }
 
   $metadataJson = cargo metadata --manifest-path src-tauri/Cargo.toml --locked --offline --format-version 1 --filter-platform x86_64-pc-windows-msvc
