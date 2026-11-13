@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="settings.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Irotona Settings</title>
+    <script type="module" src="settings.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Irotona</h1>
+        <p id="status-label">Starting...</p>
+      </div>
+      <span id="connection-pill">Checking</span>
+    </header>
+
+    <main>
+      <section class="panel" id="portable-warning" hidden>
+        <h2>Portable storage needs attention</h2>
+        <p>
+          Irotona saves <code>settings.json</code> and
+          <code>session.json</code> beside the app. Move the app to a writable
+          folder if settings or pairing do not persist.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Setup</h2>
+        <div class="field-row">
+          <label for="language-select">Language</label>
+          <select id="language-select">
+            <option value="ja">日本語</option>
+            <option value="en">English</option>
+            <option value="zh-TW">繁體中文</option>
+          </select>
+        </div>
+        <ol>
+          <li>Open Clip Studio Paint.</li>
+          <li>Choose <code>File &gt; Connect to Smartphone</code>.</li>
+          <li>Keep the QR code visible while Irotona scans.</li>
+        </ol>
+        <div class="actions">
+          <button id="scan-btn">Disconnect and scan QR</button>
+          <button id="show-palette-btn">Show palette now</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Palette settings</h2>
+        <label class="check-row">
+          <input type="checkbox" id="restrict-toggle" />
+          <span>
+            <strong>Only respond when CSP is focused</strong>
+            <small>Ignore palette shortcuts and ALT color pick while another app is active.</small>
+          </span>
+        </label>
+        <div class="field-row">
+          <label for="wheel-type">Color wheel</label>
+          <select id="wheel-type">
+            <option value="oklch">OKLCH (perceptual)</option>
+            <option value="hsv">HSV (CSP native)</option>
+            <option value="hsl">HSL (classic)</option>
+            <option value="lab">Photoshop Lab</option>
+            <option value="plane">色面パレット</option>
+            <option value="circle">カラーサークル</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label for="plane-size-select">パレットのサイズ</label>
+          <select id="plane-size-select">
+            <option value="small">小</option>
+            <option value="medium">中</option>
+            <option value="large">大</option>
+          </select>
+        </div>
+        <div id="plane-options" hidden>
+          <div class="field-row">
+            <label for="plane-view-select">色面パレットの表示</label>
+            <select id="plane-view-select">
+              <option value="focused">同明度中心</option>
+              <option value="full">全明度</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="plane-background-select">背景の質感</label>
+            <select id="plane-background-select" aria-describedby="plane-background-help">
+              <option value="plain">無地</option>
+              <option value="canvas">キャンバス地</option>
+              <option value="paper">ファインアート紙</option>
+            </select>
+          </div>
+          <p id="plane-background-help"></p>
+          <label><input type="checkbox" id="plane-shadow" aria-describedby="plane-shadow-help"> <span id="plane-shadow-label">色面に接地影を付ける</span></label>
+          <p id="plane-shadow-help"></p>
+        </div>
+        <div class="field-row">
+          <label for="palette-offset">Palette position</label>
+          <select id="palette-offset">
+            <option value="bottom-right">Bottom-right of cursor</option>
+            <option value="bottom-left">Bottom-left of cursor (left-handed)</option>
+            <option value="top-right">Top-right of cursor</option>
+            <option value="top-left">Top-left of cursor</option>
+            <option value="center">Centered on cursor</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Keyboard shortcut</h2>
+        <label class="check-row">
+          <input type="checkbox" id="shortcut-enabled" />
+          <span>
+            <strong>Enable keyboard shortcut</strong>
+            <small>Use one custom shortcut to show the palette at the cursor.</small>
+          </span>
+        </label>
+        <div class="field-row">
+          <label for="shortcut-action">操作</label>
+          <select id="shortcut-action">
+            <option value="global">パレットの表示・非表示</option>
+            <option value="eyedropper">スポイト後にパレットを表示</option>
+            <option value="hue_next">色相を進める</option>
+            <option value="hue_prev">色相を戻す</option>
+            <option value="light_up">明度を上げる</option>
+            <option value="light_down">明度を下げる</option>
+            <option value="chroma_up">彩度を上げる</option>
+            <option value="chroma_down">彩度を下げる</option>
+            <option value="cycle_mode">パレットモードを切り替える</option>
+            <option value="restore_sampled_color">取得色に戻す</option>
+            <option value="close">パレットを閉じる</option>
+          </select>
+        </div>
+        <p class="message" id="eyedropper-help" hidden></p>
+        <div class="shortcut-row">
+          <span id="shortcut-value">Off</span>
+          <button id="record-shortcut-btn">Record shortcut</button>
+          <button id="clear-shortcut-btn">Clear</button>
+        </div>
+        <div id="capture-box" hidden>
+          <strong id="capture-value">Press keys...</strong>
+          <button id="cancel-capture" type="button">キャンセル</button>
+        </div>
+        <p class="message" id="shortcut-message"></p>
+        <fieldset id="cycle-mode-options">
+          <legend></legend>
+          <label><input type="checkbox" value="oklch"> OKLCH</label>
+          <label><input type="checkbox" value="hsv"> HSV</label>
+          <label><input type="checkbox" value="hsl"> HSL</label>
+          <label><input type="checkbox" value="lab"> Lab</label>
+          <label><input type="checkbox" value="plane"> <span id="cycle-mode-plane"></span></label>
+          <label><input type="checkbox" value="circle"> <span id="cycle-mode-circle"></span></label>
+        </fieldset>
+      </section>
+
+      <section class="panel" id="color-steps">
+        <h2>Color adjustment steps</h2>
+        <p class="message">Change per key input. Percentage steps are relative to each mode’s color scale.</p>
+          <div class="color-step-row" data-color-step="hue">
+            <label for="step-hue-range" id="step-hue-label">Hue</label>
+            <input id="step-hue-range" type="range" min="1" max="30" step="any" value="2" />
+            <input type="number" min="1" max="30" step="any" value="2"
+              aria-labelledby="step-hue-label" aria-describedby="step-hue-unit" />
+            <span class="color-step-unit" id="step-hue-unit">° / key</span>
+            <button type="button">Reset</button>
+          </div>
+          <div class="color-step-row" data-color-step="chroma">
+            <label for="step-chroma-range" id="step-chroma-label">Saturation / chroma</label>
+            <input id="step-chroma-range" type="range" min="0.5" max="10" step="any" value="2.5" />
+            <input type="number" min="0.5" max="10" step="any" value="2.5"
+              aria-labelledby="step-chroma-label" aria-describedby="step-chroma-unit" />
+            <span class="color-step-unit" id="step-chroma-unit">% / key</span>
+            <button type="button">Reset</button>
+          </div>
+          <div class="color-step-row" data-color-step="lightness">
+            <label for="step-lightness-range" id="step-lightness-label">Lightness</label>
+            <input id="step-lightness-range" type="range" min="0.5" max="10" step="any" value="1" />
+            <input type="number" min="0.5" max="10" step="any" value="1"
+              aria-labelledby="step-lightness-label" aria-describedby="step-lightness-unit" />
+            <span class="color-step-unit" id="step-lightness-unit">% / key</span>
+            <button type="button">Reset</button>
+          </div>
+        <p class="message" id="color-step-message" role="status" hidden></p>
+      </section>
+
+      <section class="panel compact" id="storage-panel">
+        <h2>Storage</h2>
+        <dl>
+          <dt>Settings</dt>
+          <dd id="settings-path">...</dd>
+          <dt>Pairing</dt>
+          <dd id="session-path">...</dd>
+        </dl>
+      </section>
+    </main>
+
+    <footer>
+      <button id="close-btn">Close to tray</button>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+Luma Palette for Clip Studio Paint
+Copyright (C) 2026 Andy Fang and contributors
+
+This project is distributed under the GNU General Public License,
+version 3 or any later version.
+
+Upstream project:
+https://github.com/andyubird/LumaPaletteCSP
+
+Please preserve this notice when redistributing modified or unmodified copies
+so users can find the original project and attribution history.
+
+Irotona (formerly Luma Palette Custom)
+Modifications copyright (C) 2026 soratsuri
+
+Modified in November 2026 from Luma Palette for Clip Studio Paint v0.1.3.
+Changes include pen contact-drag selection, Japanese localization, additional
+color pickers, configurable palette and eyedropper shortcuts, pinned position
+persistence, and changes to CSP color synchronization. This public repository starts with an independent initial commit; earlier private development history is not included.
+
+The corresponding-source archive accompanying the Windows portable build
+contains the application source and the locked Windows x64 Rust dependency
+packages, with their original notices and a license inventory. The Mozilla
+Public License 2.0 applies to the identified MPL dependencies and is available
+at https://www.mozilla.org/MPL/2.0/.
+
+The canvas weave texture at src/assets/canvas-weave-prototype.png and
+fine-art-paper texture at src/assets/fine-art-paper.png are procedurally
+generated assets. Their generators are provided in scripts/. Canvas weaving
+uses optional Python regeneration dependencies; fine-art paper uses the Python
+standard library only. Neither generator is an application runtime dependency.

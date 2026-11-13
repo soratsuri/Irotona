@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 32 192 192" role="img" aria-labelledby="title desc">
+  <title>Segmented hue disc</title>
+  <desc>A compact six-color disc with a dark center and one selection point.</desc>
+  <path d="M128 128V42a86 86 0 0 1 74.48 43z" fill="#f0bf61"/>
+  <path d="m128 128 74.48-43a86 86 0 0 1 0 86z" fill="#ec845f"/>
+  <path d="m128 128 74.48 43a86 86 0 0 1-74.48 43z" fill="#d7619e"/>
+  <path d="m128 128v86a86 86 0 0 1-74.48-43z" fill="#8868e5"/>
+  <path d="m128 128-74.48 43a86 86 0 0 1 0-86z" fill="#4d91ec"/>
+  <path d="m128 128-74.48-43A86 86 0 0 1 128 42z" fill="#42c9c8"/>
+  <circle cx="128" cy="128" r="34" fill="#192133"/>
+  <circle cx="128" cy="128" r="8" fill="#f5f2e9"/>
+  <circle cx="181" cy="80" r="22" fill="#172033"/>
+  <circle cx="181" cy="80" r="14.7" fill="none" stroke="#fff9ec" stroke-width="6.1"/>
+</svg>

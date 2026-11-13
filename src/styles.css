@@ -1,0 +1,305 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: rgba(28, 29, 33, .80);
+  color: #bbb;
+  font-family: Consolas, "Yu Gothic UI", Meiryo, monospace;
+  font-size: 12px;
+  box-sizing: border-box;
+  user-select: none;
+  overflow: hidden;
+  -webkit-user-select: none;
+}
+
+body {
+  width: max-content;
+  height: max-content;
+}
+
+html { background: transparent; }
+
+body.ab-brush {
+  background: rgba(28, 29, 33, .80);
+  color: #f1f1f3;
+}
+
+.ab-brush .wheel-stack {
+  display: grid;
+  align-items: center;
+  height: var(--plane-width);
+  background: #8d8e94;
+}
+
+.ab-brush .topbar button { color: #e1e1e6; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 4px 6px 2px;
+  gap: 4px;
+  cursor: default;
+  app-region: drag;
+  touch-action: none;
+}
+
+.topbar button,
+#plane-view {
+  app-region: no-drag;
+}
+
+#info {
+  flex: 1 1 0px;
+  width: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#plane-comparison {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 58px;
+  height: 22px;
+  border: 1px solid rgba(231, 233, 238, .32);
+  border-radius: 4px;
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(20, 21, 24, .18);
+}
+
+#plane-comparison::before,
+#plane-comparison::after {
+  content: "";
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+}
+
+#plane-comparison::before { background: var(--reference-color); }
+#plane-comparison::after { background: var(--current-color); }
+
+#restore-sampled-color {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 50%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 3px 0 0 3px;
+  background: transparent;
+}
+
+#restore-sampled-color:not(:disabled) { cursor: pointer; }
+#restore-sampled-color:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+#gamut-btn, #pointer-info, #plane-view button, #palette-pin, #circle-model {
+  background: #1e1e20;
+  color: #888;
+  border: 1px solid #1e1e20;
+  padding: 2px 6px;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+#circle-model { color: #e1e1e6; }
+
+#plane-view {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 4px;
+  background: #1e1e20;
+}
+
+#plane-view button[aria-pressed="true"] {
+  background: #414650;
+  color: #fff;
+  border-color: #666d79;
+}
+
+#gamut-btn.active, #pointer-info[aria-pressed="true"], #palette-pin[aria-pressed="true"] {
+  color: #ffb347;
+  background: #2a2a2d;
+  border-color: #2a2a2d;
+}
+
+#gamut-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.container {
+  --palette-size: 280px;
+  display: grid;
+  /* Share canvas/slider columns and the footer anchor across modes. */
+  grid-template-columns: var(--palette-size) 24px;
+  align-items: start;
+  box-sizing: border-box;
+  width: max-content;
+  padding: 0 4px 4px;
+  gap: 5px 12px;
+  /* Center any unavoidable extra width; the normal case has 4px on each side. */
+  margin: 0 auto;
+}
+
+#wheel, #slider {
+  display: block;
+  flex: 0 0 auto;
+  cursor: crosshair;
+}
+
+/* Keep the native 280px drawing coordinates; scale only the display. */
+.container[data-plane-size="small"] { --palette-size: 240px; }
+.container[data-plane-size="large"] { --palette-size: 360px; }
+
+#wheel { width: var(--palette-size); height: var(--palette-size); }
+#slider { width: 24px; height: var(--palette-size); }
+
+.container.plane {
+  --plane-width: var(--palette-size);
+  --plane-height: calc(var(--plane-width) * 220 / 280);
+  grid-template-columns: var(--plane-width) 24px;
+}
+
+.container.circle .wheel-stack {
+  /* Keep the ring centered, while reserving the absent slider's column. */
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: var(--palette-size);
+}
+
+.palette-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+#color-slots { display: flex; gap: 4px; }
+
+.color-slot, #cycle-palette {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid rgba(235, 237, 242, .18);
+  border-radius: 5px;
+  background: var(--slot-color, rgba(235, 237, 242, .07));
+  color: rgba(224, 228, 236, .48);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.color-slot:not(.is-filled) {
+  border-color: rgba(235, 237, 242, .25);
+  box-shadow: 0 0 0 1px rgba(15, 16, 18, .14);
+}
+
+.color-slot { position: relative; }
+
+.color-slot:not(.is-filled)::before,
+.color-slot:not(.is-filled)::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 1px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.color-slot:not(.is-filled)::before { width: 9px; height: 1px; }
+.color-slot:not(.is-filled)::after { width: 1px; height: 9px; }
+
+#cycle-palette {
+  margin-left: auto;
+  color: rgba(224, 228, 236, .66);
+}
+
+.color-slot:hover, #cycle-palette:hover {
+  border-color: rgba(242, 244, 248, .38);
+}
+
+.color-slot:not(.is-filled):hover {
+  background: rgba(242, 244, 248, .11);
+}
+
+#cycle-palette:hover {
+  background-color: rgba(242, 244, 248, .11);
+}
+
+#cycle-palette:active {
+  background-color: rgba(242, 244, 248, .16);
+}
+
+.color-slot:not(.is-filled):active {
+  background: rgba(242, 244, 248, .16);
+}
+
+.color-slot:focus-visible, #cycle-palette:focus-visible {
+  outline: 2px solid rgba(245, 246, 250, .85);
+  outline-offset: 1px;
+}
+
+.plane #wheel {
+  width: var(--plane-width);
+  height: var(--plane-height);
+}
+
+.plane #slider {
+  height: var(--plane-height);
+}
+
+.ab-brush .plane #slider { height: var(--plane-width); }
+
+[hidden] { display: none !important; }
+
+.wheel-stack {
+  position: relative;
+}
+
+#wheel-marker {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.wheel-layers, .wheel-surface { position: relative; }
+
+.ab-brush .wheel-stack[data-shadow="true"] .wheel-surface {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
+}
+
+.ab-brush .wheel-stack:is([data-background="canvas"], [data-background="paper"])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("./assets/canvas-weave-prototype.png") center / cover no-repeat;
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+.ab-brush .wheel-stack[data-background="paper"]::before {
+  background-image: url("./assets/fine-art-paper.png");
+  opacity: 0.6;
+}
+
+#wheel, #slider {
+  touch-action: none;
+}
