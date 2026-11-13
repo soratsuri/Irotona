@@ -60,13 +60,17 @@ try {
     throw "git status failed with exit code $statusExitCode. $statusDetails"
   }
   if ($statusOutput.Count -gt 0) {
-    $diffOutput = @(git diff --no-ext-diff -- src-tauri/Cargo.toml 2>&1)
-    $diffExitCode = $LASTEXITCODE
-    $diffDetails = if ($diffExitCode -eq 0) {
-      $diffOutput -join [Environment]::NewLine
-    } else {
-      "Could not read Cargo.toml diff (git diff exit code $diffExitCode): $($diffOutput -join [Environment]::NewLine)"
+    $previousNativeCommandPreference = $PSNativeCommandUseErrorActionPreference
+    $PSNativeCommandUseErrorActionPreference = $false
+    try {
+      $diffOutput = @(git diff --no-ext-diff --text -- src-tauri/Cargo.toml 2>&1)
+      $diffExitCode = $LASTEXITCODE
+      $eolOutput = @(git ls-files --eol -- src-tauri/Cargo.toml 2>&1)
+      $eolExitCode = $LASTEXITCODE
+    } finally {
+      $PSNativeCommandUseErrorActionPreference = $previousNativeCommandPreference
     }
+    $diffDetails = "git diff exit code: $diffExitCode`n$($diffOutput -join [Environment]::NewLine)`ngit ls-files --eol exit code: $eolExitCode`n$($eolOutput -join [Environment]::NewLine)"
     throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)`n$diffDetails"
   }
 
