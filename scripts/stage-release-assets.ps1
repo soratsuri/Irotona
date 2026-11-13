@@ -46,9 +46,21 @@ foreach ($encoding in @([Text.Encoding]::ASCII, [Text.Encoding]::Unicode)) {
 
 Push-Location -LiteralPath $repoRoot
 try {
-  $changes = git status --porcelain --untracked-files=all
-  if ($LASTEXITCODE -ne 0 -or $changes) {
-    throw 'Stage from a clean checkout so the archive matches the binary source.'
+  $previousNativeCommandPreference = $PSNativeCommandUseErrorActionPreference
+  $PSNativeCommandUseErrorActionPreference = $false
+  try {
+    $statusOutput = @(git status --porcelain --untracked-files=all 2>&1)
+    $statusExitCode = $LASTEXITCODE
+  } finally {
+    $PSNativeCommandUseErrorActionPreference = $previousNativeCommandPreference
+  }
+
+  if ($statusExitCode -ne 0) {
+    $statusDetails = ($statusOutput | Out-String).Trim()
+    throw "git status failed with exit code $statusExitCode. $statusDetails"
+  }
+  if ($statusOutput.Count -gt 0) {
+    throw "Stage from a clean checkout so the archive matches the binary source:`n$($statusOutput -join [Environment]::NewLine)"
   }
 
   $metadataJson = cargo metadata --manifest-path src-tauri/Cargo.toml --locked --offline --format-version 1 --filter-platform x86_64-pc-windows-msvc
